@@ -3,122 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iTECHLAB | Grid ID Printer Pro v3.1</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <title>iTECHLAB | ID Studio Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; padding: 20px; text-align: center; margin: 0; }
+        :root { 
+            --primary: #6366f1; 
+            --accent: #10b981; 
+            --dark: #0f172a; 
+            --side-bg: #ffffff;
+            --main-bg: #f1f5f9;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        /* --- UI STYLES --- */
-        .no-print { 
-            background: white; padding: 25px; border-radius: 16px; 
-            display: inline-block; margin-bottom: 20px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            position: sticky; top: 10px; z-index: 100; border: 1px solid #e2e8f0;
-            max-width: 950px;
+        body { background: var(--main-bg); display: flex; min-height: 100vh; color: #1e293b; overflow-x: hidden; }
+
+        /* --- SIDEBAR CONTROLS --- */
+        .sidebar {
+            width: 300px;
+            background: var(--side-bg);
+            border-right: 1px solid var(--border);
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
         }
-        .controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; text-align: left; }
-        .control-group { display: flex; flex-direction: column; gap: 5px; }
-        .control-group label { font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        input[type="number"], select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 600; }
+
+        .no-print h1 { font-size: 1.1rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        .no-print .brand p { font-size: 0.65rem; color: #64748b; margin-bottom: 10px; }
+
+        .control-section { display: flex; flex-direction: column; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #eef2f6; }
+        .group-label { font-size: 0.6rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .field { display: flex; flex-direction: column; gap: 3px; }
+        .field label { font-size: 0.65rem; font-weight: 700; color: #475569; }
         
-        .btn { padding: 10px 20px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; transition: 0.2s; }
-        .btn-sync { background: #6366f1; color: white; }
-        .btn-print { background: #10b981; color: white; }
-
-        /* --- PAPER & GRID SETUP (Short Bond 8.5x11in) --- */
-        .paper {
-            width: 21.59cm; 
-            height: 27.94cm;
-            background: white;
-            margin: 20px auto;
-            display: grid;
-            grid-template-columns: 9.5cm 9.5cm;
-            grid-template-rows: 13cm 13cm;
-            gap: 5mm; 
-            padding: 1cm;
-            box-sizing: border-box;
-            justify-content: center;
-            align-content: start;
-            page-break-after: always;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        input, select {
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            outline: none;
+            transition: 0.2s;
         }
 
-        .id-slot {
-            width: 9.5cm;
-            height: 13cm;
-            border: 1px dashed #ccc;
-            position: relative;
-            background-size: 100% 100%;
-            overflow: hidden;
-            background-color: #fafafa;
-        }
-
-        .id-name {
-            position: absolute;
-            transform: translate(-50%, -50%);
+        /* --- MINI INPUTS FOR ADJUSTMENTS --- */
+        .compact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        input[type="number"] {
+            padding: 6px 8px;
             text-align: center;
-            width: 95%;
-            pointer-events: none;
-            color: #000;
-            white-space: nowrap;
+            width: 100%; /* controlled by grid */
         }
+
+        input:focus { border-color: var(--primary); background: #fff; }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
+        .btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-sync { background: var(--primary); color: white; }
+        .btn-print { background: var(--accent); color: white; }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content { margin-left: 300px; padding: 30px; width: calc(100% - 300px); }
+
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 10px; text-align: left; font-size: 0.6rem; color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+        td { padding: 8px 12px; border-bottom: 1px solid #f8fafc; font-size: 0.75rem; }
+        .user-row:hover { background: #f1f5f9; }
+
+        /* --- PRINT STYLES --- */
+        #printContainer { margin-top: 30px; }
+        .paper {
+            width: 21.59cm; height: 27.94cm;
+            background: white; margin: 0 auto 30px;
+            display: grid; grid-template-columns: 9.5cm 9.5cm;
+            grid-template-rows: 13cm 13cm; gap: 5mm; padding: 1cm;
+            page-break-after: always; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .id-slot { width: 9.5cm; height: 13cm; border: 1px dashed #cbd5e1; position: relative; background-size: 100% 100%; overflow: hidden; }
+        .id-text { position: absolute; transform: translate(-50%, -50%); text-align: center; width: 100%; white-space: nowrap; pointer-events: none; }
 
         @media print {
-            @page { size: letter; margin: 0; }
-            body { background: none; padding: 0; }
-            .no-print { display: none; }
-            .paper { box-shadow: none; margin: 0; border: none; }
+            .sidebar, .main-content { display: none !important; }
+            body { background: white; }
+            .paper { box-shadow: none; margin: 0; }
             .id-slot { border: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="no-print">
-        <h2 style="color:#1e293b; margin-bottom:5px;">🖨️ Grid ID Batch Printer</h2>
-        <p style="color:#64748b; font-size:0.85rem;">4 IDs per Page | Multi-Column Data Fix</p>
-        
-        <div class="controls">
-            <div class="control-group">
-                <label>1. Select Batch</label>
-                <select id="batchSelect">
-                    <option value="batch1">Batch 1</option>
-                    <option value="batch2">Batch 2</option>
-                    <option value="batch3">Batch 3</option>
-                </select>
+    <div class="sidebar no-print">
+        <div class="brand">
+            <h1>ID Master</h1>
+            <p>iTECHLAB Production</p>
+        </div>
+
+        <div class="control-section">
+            <span class="group-label">Batch & File</span>
+            <select id="batchSelect">
+                <option value="batch1">Batch 1</option>
+                <option value="batch2">Batch 2</option>
+                <option value="batch3">Batch 3</option>
+            </select>
+            <div class="field">
+                <label>ID Template</label>
+                <input type="file" id="tplInput" accept="image/*" style="font-size: 0.6rem;">
             </div>
-            <div class="control-group">
-                <label>2. ID Template</label>
-                <input type="file" id="tplInput" accept="image/*">
+            <div class="btn-stack">
+                <button onclick="fetchData()" class="btn btn-sync" id="syncBtn">Sync Data</button>
+                <button onclick="window.print()" class="btn btn-print">Print Selected</button>
             </div>
-            <div class="control-group">
-                <label>3. Actions</label>
-                <div style="display:flex; gap:5px;">
-                    <button onclick="fetchData()" class="btn btn-sync">Sync</button>
-                    <button onclick="window.print()" class="btn btn-print">Print</button>
+        </div>
+
+        <div class="control-section">
+            <span class="group-label">Layout Adjustments</span>
+            <div class="compact-row">
+                <div class="field">
+                    <label>Name Top %</label>
+                    <input type="number" id="nameTop" value="45">
+                </div>
+                <div class="field">
+                    <label>Name Size</label>
+                    <input type="number" id="nameSize" value="40">
                 </div>
             </div>
+            <div class="compact-row">
+                <div class="field">
+                    <label>Inst Top %</label>
+                    <input type="number" id="instTop" value="55">
+                </div>
+                <div class="field">
+                    <label>Inst Size</label>
+                    <input type="number" id="instSize" value="20">
+                </div>
+            </div>
+        </div>
 
-            <div class="control-group">
-                <label>Name Top (Vertical %)</label>
-                <input type="number" id="nameTop" value="45">
-            </div>
-            <div class="control-group">
-                <label>Name Left (Horizontal %)</label>
-                <input type="number" id="nameLeft" value="50">
-            </div>
-            <div class="control-group">
-                <label>Font Size (PX)</label>
-                <input type="number" id="nameSize" value="40">
-            </div>
-            <div class="control-group">
-                <label>Reset Settings</label>
-                <button onclick="location.reload()" style="padding:8px; border-radius:8px; border:1px solid #ddd; cursor:pointer;">Reset All</button>
-            </div>
+        <div class="control-section">
+            <span class="group-label">Filters</span>
+            <input type="text" id="searchInput" placeholder="Search by Name..." onkeyup="filterSelection()">
+            <input type="text" id="instSearchInput" placeholder="Search Institution..." onkeyup="filterSelection()" style="margin-top: 5px;">
         </div>
     </div>
 
-    <div id="printContainer"></div>
+    <div class="main-content no-print">
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="40" style="text-align:center"><input type="checkbox" id="selectAll" onclick="toggleAll(this)" checked></th>
+                        <th>Name</th>
+                        <th>Institution</th>
+                    </tr>
+                </thead>
+                <tbody id="selectionBody">
+                    <tr><td colspan="3" style="text-align:center; padding: 20px; color:#94a3b8; font-size: 0.7rem;">Database not synced yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="printContainer"></div>
+    </div>
 
     <script>
         const BATCH_URLS = {
@@ -127,86 +199,104 @@
             'batch3': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRbCq73MJLutPIdiSHMtsLgzvzE0QrPOJuHC2CPbb8B1H0Yi3Ewije4kqdwLEvR8Fc9X1mf0dqh4nAb/pub?gid=801337014&single=true&output=csv'
         };
 
-        let participants = [];
+        let allParticipants = [];
         let templateImg = "";
 
         document.getElementById('tplInput').addEventListener('change', function(e) {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                templateImg = event.target.result;
-                refreshPreview();
-            };
+            reader.onload = (ev) => { templateImg = ev.target.result; generateIDs(); };
             reader.readAsDataURL(e.target.files[0]);
         });
 
         async function fetchData() {
             const batch = document.getElementById('batchSelect').value;
-            const syncBtn = document.querySelector('.btn-sync');
-            syncBtn.innerText = "⌛ Syncing...";
+            const btn = document.getElementById('syncBtn');
+            btn.innerText = "⌛...";
             
             try {
                 const response = await fetch(BATCH_URLS[batch] + `&t=${Date.now()}`);
                 const csv = await response.text();
                 const rows = csv.split(/\r?\n/).slice(1);
                 
-                participants = rows.map(row => {
-                    // This Regex ensures we split only by commas that are NOT inside double quotes
+                allParticipants = rows.map(row => {
                     const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    
-                    if (cols && cols.length > 0) {
-                        // FIX: Use ONLY Index 0. 
-                        // Your Apps Script already constructs the Full Name there.
-                        let fullName = cols[0].replace(/"/g, '').trim();
-                        return { name: fullName.toUpperCase() };
+                    if (cols && cols.length > 10) {
+                        return { 
+                            name: `${cols[1]} ${cols[2]}${cols[4] ? ' ' + cols[4] : ''}`.toUpperCase().replace(/"/g, '').trim(),
+                            institution: cols[10]?.toUpperCase().replace(/"/g, '').trim() || "N/A",
+                            selected: true
+                        };
                     }
                     return null;
-                }).filter(p => p && p.name !== "" && p.name !== "FULL NAME");
+                }).filter(p => p && p.name !== "");
 
-                refreshPreview();
-                syncBtn.innerText = "Sync";
-            } catch (err) { 
-                alert("Failed to sync sheet data. Check your internet or CSV link."); 
-                syncBtn.innerText = "Sync";
-            }
+                renderTable();
+                generateIDs();
+                btn.innerText = "Sync Data";
+            } catch (e) { alert("Sync failed."); btn.innerText = "Sync Data"; }
         }
 
-        function refreshPreview() {
-            const container = document.getElementById('printContainer');
-            container.innerHTML = ''; 
+        function renderTable() {
+            document.getElementById('selectionBody').innerHTML = allParticipants.map((p, i) => `
+                <tr class="user-row">
+                    <td style="text-align:center"><input type="checkbox" ${p.selected ? 'checked' : ''} onchange="updateSel(${i}, this.checked)"></td>
+                    <td style="font-weight:700">${p.name}</td>
+                    <td style="color:#64748b; font-size:0.65rem">${p.institution}</td>
+                </tr>
+            `).join('');
+        }
 
-            const nTop = document.getElementById('nameTop').value;
-            const nLeft = document.getElementById('nameLeft').value;
-            const nSize = document.getElementById('nameSize').value;
+        function updateSel(i, val) { allParticipants[i].selected = val; generateIDs(); }
 
-            let currentPage;
+        function toggleAll(el) { 
+            allParticipants.forEach(p => p.selected = el.checked); 
+            renderTable(); 
+            generateIDs(); 
+        }
+
+        function filterSelection() {
+            const nameQ = document.getElementById('searchInput').value.toUpperCase();
+            const instQ = document.getElementById('instSearchInput').value.toUpperCase();
             
-            participants.forEach((p, index) => {
-                if (index % 4 === 0) {
-                    currentPage = document.createElement('div');
-                    currentPage.className = 'paper';
-                    container.appendChild(currentPage);
-                }
-
-                const slot = document.createElement('div');
-                slot.className = 'id-slot';
-                if(templateImg) slot.style.backgroundImage = `url('${templateImg}')`;
-
-                slot.innerHTML = `
-                    <div class="id-name" style="
-                        top:${nTop}%; 
-                        left:${nLeft}%; 
-                        font-size:${nSize}px; 
-                        font-weight:800;
-                    ">
-                        ${p.name}
-                    </div>
-                `;
-                currentPage.appendChild(slot);
+            document.querySelectorAll('.user-row').forEach(row => {
+                const nameTxt = row.cells[1].innerText.toUpperCase();
+                const instTxt = row.cells[2].innerText.toUpperCase();
+                const matchesName = nameTxt.includes(nameQ);
+                const matchesInst = instTxt.includes(instQ);
+                row.style.display = (matchesName && matchesInst) ? '' : 'none';
             });
         }
 
-        ['nameTop', 'nameLeft', 'nameSize'].forEach(id => {
-            document.getElementById(id).addEventListener('input', refreshPreview);
+        function generateIDs() {
+            const container = document.getElementById('printContainer');
+            container.innerHTML = '';
+            const nTop = document.getElementById('nameTop').value;
+            const nSize = document.getElementById('nameSize').value;
+            const iTop = document.getElementById('instTop').value;
+            const iSize = document.getElementById('instSize').value;
+
+            const selectedList = allParticipants.filter(p => p.selected);
+            let page;
+            
+            selectedList.forEach((p, idx) => {
+                if (idx % 4 === 0) {
+                    page = document.createElement('div');
+                    page.className = 'paper';
+                    container.appendChild(page);
+                }
+                const slot = document.createElement('div');
+                slot.className = 'id-slot';
+                if(templateImg) slot.style.backgroundImage = `url('${templateImg}')`;
+                slot.innerHTML = `
+                    <div class="id-text" style="top:${nTop}%; font-size:${nSize}px; left:50%; font-weight:800; color:#000;">${p.name}</div>
+                    <div class="id-text" style="top:${iTop}%; font-size:${iSize}px; left:50%; font-weight:600; color:#334155;">${p.institution}</div>
+                `;
+                page.appendChild(slot);
+            });
+        }
+
+        ['nameTop', 'nameSize', 'instTop', 'instSize'].forEach(id => {
+            document.getElementById(id).addEventListener('input', generateIDs);
         });
     </script>
 </body>
